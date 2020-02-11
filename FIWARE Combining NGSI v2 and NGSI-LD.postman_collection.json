@@ -1,0 +1,290 @@
+{
+	"info": {
+		"_postman_id": "7367a435-0adb-4bf9-9063-7520c1d59846",
+		"name": "FIWARE Combining NGSI v2 and NGSI-LD",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Copy NGSI v2 Data as NGSI-LD",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "fiware-service",
+						"value": "openiot",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"One-off Subscription to copy Device Entities\",\n  \"subject\": {\n    \"entities\": [\n      {\n        \"idPattern\": \".*\"\n      }\n    ]\n  },\n  \"notification\": {\n    \"http\": {\n      \"url\": \"http://tutorial:3000/device/subscription/initialize\"\n    }\n  },\n  \"expires\": \"2017-01-01T14:00:00.00Z\"\n}"
+				},
+				"url": {
+					"raw": "http://{{device-edge}}/v2/subscriptions/",
+					"protocol": "http",
+					"host": [
+						"{{device-edge}}"
+					],
+					"path": [
+						"v2",
+						"subscriptions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set up Lamp subscription",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "fiware-service",
+						"value": "openiot",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"Notify Subscription Listener of Lamp context changes\",\n  \"subject\": {\n    \"entities\": [\n      {\n        \"idPattern\": \"Lamp.*\"\n      }\n    ],\n    \"condition\": {\n      \"attrs\": [\"luminosity\"]\n    }\n  },\n  \"notification\": {\n    \"http\": {\n      \"url\": \"http://tutorial:3000/device/subscription/luminosity\"\n    },\n    \"attrs\": [\"luminosity\", \"controlledAsset\", \"supportedUnits\"]\n  },\n  \"throttling\": 5\n}"
+				},
+				"url": {
+					"raw": "http://{{device-edge}}/v2/subscriptions/",
+					"protocol": "http",
+					"host": [
+						"{{device-edge}}"
+					],
+					"path": [
+						"v2",
+						"subscriptions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set up Motion subscription",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "fiware-service",
+						"type": "text",
+						"value": "openiot"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"Notify Subscription Listener of Motion context changes\",\n  \"subject\": {\n    \"entities\": [\n      {\n        \"idPattern\": \"urn:ngsi-ld:Motion.*\"\n      }\n    ],\n    \"condition\": {\n      \"attrs\": [ \"count\" ]\n    }\n  },\n  \"notification\": {\n    \"http\": {\n      \"url\": \"http://tutorial:3000/subscription/count\"\n    },\n    \"attrs\": [\"count\", \"refStore\", \"supportedUnits\" ]\n  }\n}"
+				},
+				"url": {
+					"raw": "http://{{device-edge}}/v2/subscriptions/",
+					"protocol": "http",
+					"host": [
+						"{{device-edge}}"
+					],
+					"path": [
+						"v2",
+						"subscriptions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read subscriptions",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "fiware-service",
+						"value": "openiot",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{device-edge}}/v2/subscriptions/",
+					"protocol": "http",
+					"host": [
+						"{{device-edge}}"
+					],
+					"path": [
+						"v2",
+						"subscriptions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read from Lamp",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Link",
+						"value": "<{{datamodels-context.jsonld}}>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{orion}}/ngsi-ld/v1/entities/urn:ngsi-ld:Lamp:001",
+					"protocol": "http",
+					"host": [
+						"{{orion}}"
+					],
+					"path": [
+						"ngsi-ld",
+						"v1",
+						"entities",
+						"urn:ngsi-ld:Lamp:001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read from Motion Sensor Copy",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Link",
+						"value": "<{{datamodels-context.jsonld}}>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{orion}}/ngsi-ld/v1/entities/urn:ngsi-ld:Motion:004",
+					"protocol": "http",
+					"host": [
+						"{{orion}}"
+					],
+					"path": [
+						"ngsi-ld",
+						"v1",
+						"entities",
+						"urn:ngsi-ld:Motion:004"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read from Store 1",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Link",
+						"value": "<{{datamodels-context.jsonld}}>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{orion}}/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001?",
+					"protocol": "http",
+					"host": [
+						"{{orion}}"
+					],
+					"path": [
+						"ngsi-ld",
+						"v1",
+						"entities",
+						"urn:ngsi-ld:Building:store001"
+					],
+					"query": [
+						{
+							"key": "options",
+							"value": "keyValues",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "91cf54e0-d9c1-41af-81a4-50f33ee8fc8e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "57f4bec4-173f-4e09-9032-08844d2c08be",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "eb2162e6-38fb-444c-a57e-c80176d33e07",
+			"key": "orion",
+			"value": "localhost:1026",
+			"type": "string"
+		},
+		{
+			"id": "986da4bf-dd85-42f6-9299-5b037a8e806f",
+			"key": "datamodels-context.jsonld",
+			"value": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
+			"type": "string"
+		},
+		{
+			"id": "a9010729-d6b6-4719-9a0c-4eaaa39acab0",
+			"key": "device-edge",
+			"value": "localhost:1027",
+			"type": "string"
+		},
+		{
+			"id": "d4572c5f-073b-47ec-b788-c4b5bab1f17d",
+			"key": "context-provider",
+			"value": "localhost:3000",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
