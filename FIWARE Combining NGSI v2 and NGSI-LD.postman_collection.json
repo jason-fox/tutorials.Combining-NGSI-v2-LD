@@ -93,7 +93,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"description\": \"Notify Subscription Listener of Motion context changes\",\n  \"subject\": {\n    \"entities\": [\n      {\n        \"idPattern\": \"urn:ngsi-ld:Motion.*\"\n      }\n    ],\n    \"condition\": {\n      \"attrs\": [ \"count\" ]\n    }\n  },\n  \"notification\": {\n    \"http\": {\n      \"url\": \"http://tutorial:3000/subscription/count\"\n    },\n    \"attrs\": [\"count\", \"refStore\", \"supportedUnits\" ]\n  }\n}"
+					"raw": "{\n  \"description\": \"Notify Subscription Listener of Motion context changes\",\n  \"subject\": {\n    \"entities\": [\n      {\n        \"idPattern\": \"Motion.*\"\n      }\n    ],\n    \"condition\": {\n      \"attrs\": [ \"count\" ]\n    }\n  },\n  \"notification\": {\n    \"http\": {\n      \"url\": \"http://tutorial:3000/subscription/count\"\n    },\n    \"attrs\": [\"count\", \"refStore\", \"supportedUnits\" ]\n  }\n}"
 				},
 				"url": {
 					"raw": "http://{{device-edge}}/v2/subscriptions/",
@@ -111,7 +111,7 @@
 			"response": []
 		},
 		{
-			"name": "Read subscriptions",
+			"name": "Read subscriptions (OpenIoT)",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -177,7 +177,7 @@
 			"response": []
 		},
 		{
-			"name": "Read from Motion Sensor Copy",
+			"name": "Read from Motion Sensor",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -215,7 +215,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://{{orion}}/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001?",
+					"raw": "http://{{orion}}/ngsi-ld/v1/entities/urn:ngsi-ld:Building:store001",
 					"protocol": "http",
 					"host": [
 						"{{orion}}"
@@ -236,13 +236,82 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Copy Building Data to Database (default tenant)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"One-off Subscription to copy Building Entities\",\n  \"subject\": {\n    \"entities\": [\n      {\n      \t\"idPattern\": \".*\",\n        \"type\": \"Store\"\n      }\n    ]\n  },\n  \"notification\": {\n    \"http\": {\n      \"url\": \"http://tutorial:3000/building/subscription\"\n    },\n    \"attrsFormat\": \"keyValues\"\n  },\n  \"expires\": \"2017-01-01T14:00:00.00Z\"\n}"
+				},
+				"url": {
+					"raw": "http://{{orion}}/v2/subscriptions/",
+					"protocol": "http",
+					"host": [
+						"{{orion}}"
+					],
+					"path": [
+						"v2",
+						"subscriptions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read subscriptions (default tenant)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "fiware-service",
+						"value": "openiot",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{orion}}/v2/subscriptions/",
+					"protocol": "http",
+					"host": [
+						"{{orion}}"
+					],
+					"path": [
+						"v2",
+						"subscriptions",
+						""
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "91cf54e0-d9c1-41af-81a4-50f33ee8fc8e",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -252,7 +321,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "57f4bec4-173f-4e09-9032-08844d2c08be",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -262,29 +330,20 @@
 	],
 	"variable": [
 		{
-			"id": "eb2162e6-38fb-444c-a57e-c80176d33e07",
 			"key": "orion",
-			"value": "localhost:1026",
-			"type": "string"
+			"value": "localhost:1026"
 		},
 		{
-			"id": "986da4bf-dd85-42f6-9299-5b037a8e806f",
 			"key": "datamodels-context.jsonld",
-			"value": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld",
-			"type": "string"
+			"value": "https://fiware.github.io/tutorials.Step-by-Step/tutorials-context.jsonld"
 		},
 		{
-			"id": "a9010729-d6b6-4719-9a0c-4eaaa39acab0",
 			"key": "device-edge",
-			"value": "localhost:1027",
-			"type": "string"
+			"value": "localhost:1027"
 		},
 		{
-			"id": "d4572c5f-073b-47ec-b788-c4b5bab1f17d",
 			"key": "context-provider",
-			"value": "localhost:3000",
-			"type": "string"
+			"value": "localhost:3000"
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
