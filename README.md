@@ -2,7 +2,7 @@
 
 
 -  Want to augment our own NGSI-LD application using data from an existing third-party NGSI-v2  system on the edge
--  We are using common smart data models and have an existing public @context file
+-  We are using common smart data models and have an existing public `@context` file
 -  The third-party system is using NGSI-v2 (and potentially a different data model)
 -  Cannot refactor the existing edge system 
 
