@@ -22,7 +22,7 @@ curl -s -o /dev/null -X POST \
  "services": [
    {
      "apikey":      "1068318794",
-     "cbroker":     "http://orion:1026",
+     "cbroker":     "http://devices:1027",
      "entity_type": "Motion",
      "resource":    "/iot/d",
      "protocol":    "PDI-IoTA-UltraLight",
@@ -40,7 +40,7 @@ curl -s -o /dev/null -X POST \
    },
    {
      "apikey":      "3020035",
-     "cbroker":     "http://orion:1026",
+     "cbroker":     "http://devices:1027",
      "entity_type": "Bell",
      "resource":    "/iot/d",
      "protocol":    "PDI-IoTA-UltraLight",
@@ -66,7 +66,7 @@ curl -s -o /dev/null -X POST \
    },
    {
      "apikey":      "3314136",
-     "cbroker":     "http://orion:1026",
+     "cbroker":     "http://devices:1027",
      "entity_type": "Lamp",
      "resource":    "/iot/d",
      "protocol":    "PDI-IoTA-UltraLight",
@@ -77,21 +77,18 @@ curl -s -o /dev/null -X POST \
         {"name": "off","type": "command"}
      ],
      "attributes": [
-        {"object_id": "s", "name": "state", "type":"Text",
-          "metadata":{
-              "unitCode":{"type": "Text", "value" :"CAL"}
-          }
+        {"object_id": "s", "name": "state", "type":"Text"
+          
         },
-        {"object_id": "l", "name": "luminosity", "type":"Integer"}
+        {"object_id": "l", "name": "luminosity", "type":"Integer",
+          "metadata":{
+            "unitCode":{"type": "Text", "value" :"CDL"}
+          }
+        }
      ],
      "static_attributes": [
           {"name": "category", "type":"Text", "value": ["actuator","sensor"]},
-          {"name": "controlledProperty", "type": "Text", "value": ["light"],
-            "metadata":{
-              "includes":{"type": "Text", "value" :["state", "luminosity"]},
-              "alias":{"type": "Text", "value" :"lamp"}
-            }
-          },
+          {"name": "controlledProperty", "type": "Text", "value": ["light"]},
           {"name": "function", "type": "Text", "value":["on", "off"]},
           {"name": "supportedProtocol", "type": "Text", "value": ["ul20"]},
           {"name": "supportedUnits", "type": "Text", "value": "CDL"}
@@ -99,7 +96,7 @@ curl -s -o /dev/null -X POST \
    },
    {
      "apikey":      "3089326",
-     "cbroker":     "http://orion:1026",
+     "cbroker":     "http://devices:1027",
      "entity_type": "Door",
      "resource":    "/iot/d",
      "protocol":    "PDI-IoTA-UltraLight",

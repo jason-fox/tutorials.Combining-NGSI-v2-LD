@@ -20,8 +20,8 @@ version: "3.5"
 services:
   # Orion LD is the context broker
   orion:
-#    image: fiware/orion-ld:${ORION_LD_VERSION}
-    image: fiware/orion-ld
+    image: fiware/orion-ld:${ORION_LD_VERSION}
+#    image: fiware/orion-ld
     hostname: orion
     container_name: fiware-orion-ld
     depends_on:
@@ -30,7 +30,7 @@ services:
       - default
     ports:
       - "${ORION_LD_PORT}:${ORION_LD_PORT}" # localhost:1026
-    command: -dbhost mongo-db -logLevel DEBUG -t 255
+    command: -dbhost mongo-db -logLevel DEBUG -forwarding
     healthcheck:
       test: curl --fail -s http://orion:${ORION_LD_PORT}/version || exit 1
 
@@ -47,7 +47,7 @@ services:
     expose:
       - "${ORION_EDGE_PORT}"
     ports:
-      - "${ORION_EDGE_PORT}:${ORION_EDGE_PORT}" # localhost:1026
+      - "${ORION_EDGE_PORT}:${ORION_EDGE_PORT}" # localhost:1027
     command: -dbhost mongo-db -db edge -logLevel DEBUG -port ${ORION_EDGE_PORT}
     healthcheck:
       test: curl --fail -s http://devices:${ORION_EDGE_PORT}/version || exit 1
@@ -116,12 +116,16 @@ services:
       - "${TUTORIAL_APP_PORT}:${TUTORIAL_APP_PORT}" # localhost:3000
       - "${TUTORIAL_DUMMY_DEVICE_PORT}:${TUTORIAL_DUMMY_DEVICE_PORT}" # localhost:3001
     environment:
-      - "DEBUG=tutorial:*"
-      - "WEB_APP_PORT=${TUTORIAL_APP_PORT}" # Port used by the content provider proxy and web-app for viewing data
-      - "NGSI_VERSION=ngsi-ld"
-      - "CONTEXT_BROKER=http://orion:${ORION_LD_PORT}/ngsi-ld/v1" # URL of the context broker to update context
-      - "DEVICE_BROKER=http://devices:${ORION_EDGE_PORT}/v2" # URL of the device's context broker to update context
+      - DEBUG=tutorial:*
+      - MONGO_URL=mongodb://mongo-db:27017
+      - WEB_APP_PORT=${TUTORIAL_APP_PORT} # Port used by the content provider proxy and web-app for viewing data
+      - NGSI_VERSION=ngsi-ld
+      - CONTEXT_BROKER=http://orion:${ORION_LD_PORT}/ngsi-ld/v1 # URL of the context broker to update context
+      - DEVICE_VERSION=ngsi-v2
+      - DEVICE_BROKER=http://devices:${ORION_EDGE_PORT}/v2 # URL of the device's context broker to update context
       - "NGSI_LD_PREFIX=urn:ngsi-ld:"
+      #- IOTA_JSON_LD_CONTEXT=http://context:3000/data-models/ngsi-context.jsonld
+      #- NGSI_LD_TENANT=openiot
       
       - "IOTA_HTTP_HOST=iot-agent"
       - "IOTA_HTTP_PORT=${IOTA_SOUTH_PORT}"
