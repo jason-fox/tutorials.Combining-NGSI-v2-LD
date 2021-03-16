@@ -14,6 +14,52 @@ such as `unitCode` and `providedBy`)
 ![](https://jason-fox.github.io/tutorials.Combining-NGSI-v2-LD/img/architecture.png)
 
 
+
+
+### Copy NGSI v2 Data as NGSI-LD
+
+Raise an expired NGSI-v2 subscription to raise a one-off subscription. Each entity is processed in turn by the 
+`http://tutorial:3000/device/subscription/initialize` endpoint. The code for processing entities can be found
+[here](https://github.com/FIWARE/tutorials.Step-by-Step/blob/master/context-provider/controllers/ngsi-ld/device-convert.js)
+
+```javascript
+function duplicateDevices(req, res) {
+    async function copyEntityData(device, index) {
+        await upsertDeviceEntityAsLD(device);
+    }
+    req.body.data.forEach(copyEntityData);
+    res.status(204).send();
+}
+```
+
+Each entry is converted an upserted using the function below:
+
+```javascript
+function upsertDeviceEntityAsLD(device) {
+    return new Promise((resolve, reject) => {
+        const json = convertEntityToLD(device);
+        delete json['@context']; // Not required for Linked Data Upsert.
+
+        const options = {
+            url: basePath + '/entityOperations/upsert/?options=update',
+            method: 'POST',
+            json: [json],
+            headers: {
+                'Content-Type': 'application/json',
+                Link:
+                    '<' + dataModelContext + '>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+            }
+        };
+
+        request(options, (error, response, body) => {
+            return error ? reject(error) : resolve();
+        });
+    });
+}
+```
+
+
+
 #### Request
 
 ```console
@@ -36,6 +82,29 @@ curl -L -X POST 'http://localhost:1027/v2/subscriptions/' \
   },
   "expires": "2017-01-01T14:00:00.00Z"
 }'
+```
+
+### Raise as device shadowing subscription
+
+Raise an ongoging NGSI-v2 subscription. Each entity is processed in turn by the `device/subscription/luminosity`
+endpoint which updates the shadowed device and also upserts the `controllingAsset` (in this case the building
+the lamp is located in.)
+
+
+```javascript
+function shadowDeviceMeasures(req, res) {
+    const attrib = req.params.attrib;
+
+    async function copyAttributeData(device, index) {
+        await upsertDeviceEntityAsLD(device);
+        if (device[attrib]) {
+            await upsertLinkedAttributeDataAsLD(device, 'controlledAsset', attrib);
+        }
+    }
+
+    req.body.data.forEach(copyAttributeData);
+    res.status(204).send();
+}
 ```
 
 
@@ -66,6 +135,12 @@ curl -L -X POST 'http://localhost:1027/v2/subscriptions/' \
   "throttling": 5
 }'
 ```
+
+### Retrieve the NGSI-LD version of the device
+
+Lamp1 is mapped to `http://localhost:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Lamp:001` within the NGSI-LD context broker.
+It can be retrieved by a simple entity request. `unitCode` and `observedAt` have been extracted as _Property-of-Property_
+string elements in the response.
 
 #### Request
 
@@ -163,6 +238,12 @@ curl -L -X GET 'http://localhost:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Lamp:001' 
     }
 }
 ```
+
+### Retrieve the NGSI-LD version of the store
+
+The subscription code also updates the `luminosity` attribute of the Building `urn:ngsi-ld:Building:store001`
+this is a linked data element which, in addition to the `unitCode` holds a _Relationship-of-Property_ attribute called
+`providedBy` enabling the navigation of the knowledge graph.
 
 #### Request
 
